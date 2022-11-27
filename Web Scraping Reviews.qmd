@@ -14,17 +14,30 @@ library(rvest)
 ## Figure out initial scraping code
 
 ```{r}
-restaurant_home_link <- 
-  # "https://www.yelp.com/biz/el-vaquero-mexican-restaurant-columbus-10"
-  "https://www.yelp.com/biz/el-vaquero-mexican-restaurant-columbus-15"
+restaurant_home_links <- 
+  c("https://www.yelp.com/biz/el-vaquero-mexican-restaurant-columbus-10",
+    "https://www.yelp.com/biz/el-vaquero-mexican-restaurant-columbus-15")
 ```
 
 #### Get the count of pages for the restaurant.
 
 ```{r}
-page <- read_html(restaurant_home_link)
+page <- read_html(restaurant_home_links[1])
 
-page_count <- 
+page_count_1 <- 
+  page %>% 
+  html_element("#reviews 
+               div.border-color--default__09f24__NPAKY.text-align--center__09f24__fYBGO 
+               span.css-chan6m") %>% 
+  html_text() %>% 
+  str_remove("1 of ") %>% 
+  as.numeric()
+```
+
+```{r}
+page <- read_html(restaurant_home_links[2])
+
+page_count_2 <- 
   page %>% 
   html_element("#reviews 
                div.border-color--default__09f24__NPAKY.text-align--center__09f24__fYBGO 
@@ -39,18 +52,30 @@ page_count <-
 It looks like Yelp shows 10 reviews per page and each page's URL says the number of review it starts on. (E.g., page 2's URL ends in "start=10".
 
 ```{r}
-links <-
-  paste0(restaurant_home_link,
+links_1 <-
+  paste0(restaurant_home_links[1],
          "?start=",
-         seq(0, (page_count - 1) * 10, 10),
+         seq(0, (page_count_1 - 1) * 10, 10),
          "&sort_by=date_asc")
 ```
+
+```{r}
+links_2 <-
+  paste0(restaurant_home_links[2],
+         "?start=",
+         seq(0, (page_count_2 - 1) * 10, 10),
+         "&sort_by=date_asc")
+```
+
+```{r}
+links <- c(links_1, links_2)
+```
+
+## Figuring out all the CSS selectors to scrape
 
 #### Get usernames
 
 ```{r}
-#page <- read_html(links[16])
-
 usernames <- 
   page %>% 
   html_elements("#reviews > section > div.css-79elbk.border-color--default__09f24__NPAKY li.margin-b5__09f24__pTvws.border-color--default__09f24__NPAKY") %>% 
@@ -99,4 +124,96 @@ text <-
   html_elements("#reviews > section > div.css-79elbk.border-color--default__09f24__NPAKY li.margin-b5__09f24__pTvws.border-color--default__09f24__NPAKY") %>% 
   html_element("span.raw__09f24__T4Ezm") %>% 
   html_text(trim = TRUE)
+```
+
+## Loop through links to collect data
+
+```{r}
+el_vaq_data <- data.frame()
+
+for (i in seq_along(links)) {
+  
+  # read page
+  # page <- read_html(links[i])
+  download.file(links[i], destfile = "scrapedpage.html", quiet=TRUE)
+  page <- read_html("scrapedpage.html")
+  
+  # usernames
+  usernames <-
+    page %>%
+    html_elements(
+      "#reviews > section > div.css-79elbk.border-color--default__09f24__NPAKY li.margin-b5__09f24__pTvws.border-color--default__09f24__NPAKY"
+    ) %>%
+    html_element("a.css-1m051bw") %>%
+    html_text()
+  
+  # user_locations
+  user_locations <-
+    page %>%
+    html_elements(
+      "#reviews > section > div.css-79elbk.border-color--default__09f24__NPAKY li.margin-b5__09f24__pTvws.border-color--default__09f24__NPAKY"
+    ) %>%
+    html_element("span.css-qgunke") %>%
+    html_text()
+  
+  # ratings
+  ratings <-
+    page %>%
+    html_elements(
+      "#reviews > section > div.css-79elbk.border-color--default__09f24__NPAKY li.margin-b5__09f24__pTvws.border-color--default__09f24__NPAKY"
+    ) %>%
+    html_element("div.arrange-unit__09f24__rqHTg.border-color--default__09f24__NPAKY span div") %>%
+    html_attr("aria-label") %>%
+    str_remove(" star rating") %>%
+    as.numeric()
+  
+  # dates
+  dates <-
+    page %>%
+    html_elements(
+      "#reviews > section > div.css-79elbk.border-color--default__09f24__NPAKY li.margin-b5__09f24__pTvws.border-color--default__09f24__NPAKY"
+    ) %>%
+    html_element("span.css-chan6m") %>%
+    html_text() %>%
+    as.Date("%m/%d/%Y")
+  
+  # text
+  text <-
+    page %>%
+    html_elements(
+      "#reviews > section > div.css-79elbk.border-color--default__09f24__NPAKY li.margin-b5__09f24__pTvws.border-color--default__09f24__NPAKY"
+    ) %>%
+    html_element("span.raw__09f24__T4Ezm") %>%
+    html_text(trim = TRUE)
+  
+  # put vectors into temporary data.frame
+  temp_data_frame <- 
+    data.frame(link = rep(links[i], length(usernames)),
+               usernames = usernames,
+               user_locations = user_locations,
+               ratings = ratings,
+               dates = dates,
+               text = text)
+  
+  # bind temporary data.frame to full data
+  el_vaq_data <- 
+    rbind(el_vaq_data,
+          temp_data_frame)
+  
+  # Sleep before going to next page.
+  Sys.sleep(runif(1, 60*2, 60*3))
+  # Yelp's robtos.txt suggests that their pages should not be scraped
+  # So, I am sleeping 2-3 minutes between each page request to ensure 
+  # I am not asking too much of their servers.
+}
+
+# Delete the last downloaded html file
+file.remove("scrapedpage.html")
+```
+
+## Export data
+
+```{r}
+write.csv(el_vaq_data,
+          "el vaquero yelp reviews.csv")
 ```
