@@ -45,3 +45,37 @@ links <-
          seq(0, (page_count - 1) * 10, 10),
          "&sort_by=date_asc")
 ```
+
+#### Get usernames
+
+```{r}
+#page <- read_html(links[16])
+
+usernames <- 
+  page %>% 
+  html_elements("#reviews > section > div.css-79elbk.border-color--default__09f24__NPAKY li.margin-b5__09f24__pTvws.border-color--default__09f24__NPAKY") %>% 
+  html_element("a.css-1m051bw") %>% 
+  html_text()
+```
+
+#### Get user location
+
+```{r}
+user_locations <- 
+  page %>% 
+  html_elements("#reviews > section > div.css-79elbk.border-color--default__09f24__NPAKY li.margin-b5__09f24__pTvws.border-color--default__09f24__NPAKY") %>% 
+  html_element("span.css-qgunke") %>% 
+  html_text()
+```
+
+#### Get ratings
+
+```{r}
+ratings <- 
+  page %>% 
+  html_elements("#reviews > section > div.css-79elbk.border-color--default__09f24__NPAKY li.margin-b5__09f24__pTvws.border-color--default__09f24__NPAKY") %>% 
+  html_element("div.arrange-unit__09f24__rqHTg.border-color--default__09f24__NPAKY span div") %>% 
+  html_attr("aria-label") %>% 
+  str_remove(" star rating") %>% 
+  as.numeric()
+```
