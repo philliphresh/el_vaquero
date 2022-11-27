@@ -1,22 +1,46 @@
----
-title: "El Vaquero Analysis"
-author: "Phillip Sanderell"
-format: html
-editor: visual
----
+El Vaquero Analysis
+================
+Phillip Sanderell
 
 ## Import Data
 
 Load the scraped review data.
 
-```{r}
+``` r
 library(tidyverse)
+```
+
+    ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
+
+    ✔ ggplot2 3.3.6     ✔ purrr   0.3.4
+    ✔ tibble  3.1.7     ✔ dplyr   1.0.9
+    ✔ tidyr   1.2.0     ✔ stringr 1.4.0
+    ✔ readr   2.1.2     ✔ forcats 0.5.1
+
+    ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+    ✖ dplyr::filter() masks stats::filter()
+    ✖ dplyr::lag()    masks stats::lag()
+
+``` r
 el_vaq <- read_csv("el vaquero yelp reviews.csv")
 ```
 
+    New names:
+    • `` -> `...1`
+
+    Rows: 360 Columns: 7
+    ── Column specification ────────────────────────────────────────────────────────
+    Delimiter: ","
+    chr  (4): link, usernames, user_locations, text
+    dbl  (2): ...1, ratings
+    date (1): dates
+
+    ℹ Use `spec()` to retrieve the full column specification for this data.
+    ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
 ## Clean Data
 
-```{r}
+``` r
 el_vaq <- 
   el_vaq %>% 
   select(-...1) %>% 
@@ -38,19 +62,29 @@ el_vaq <-
 
 ## Quick data vizes
 
+Make the vizes pretty
+
+``` r
+library(MetBrewer)
+theme_set(theme_minimal())
+```
+
 Side-by-side proportional bar plot of ratings distribution
 
-```{r}
+``` r
 el_vaq %>% 
   mutate(ratings = fct_reorder(as.factor(ratings), -ratings)) %>% 
   ggplot(aes(x = location, fill = ratings)) +
   geom_bar(position = "fill") +
   labs(title = "Distribution of star ratings",
        x = NULL, y = NULL) +
-  scale_y_continuous(labels = scales::label_percent())
+  scale_y_continuous(labels = scales::label_percent()) +
+  scale_fill_manual(values = met.brewer("Tam", 5))
 ```
 
-```{r}
+![](README_files/figure-gfm/unnamed-chunk-4-1.png)
+
+``` r
 el_vaq %>% 
   mutate(international = state_or_country %in% c("France", "Ireland", "Singapore")) %>% 
   mutate(state_or_country = fct_lump_min(state_or_country, 5)) %>% 
@@ -67,10 +101,13 @@ el_vaq %>%
        y = NULL, x = NULL, fill = NULL,
        subtitle = "Olentangy has a lot more visitors outside of Ohio") +
   scale_x_continuous(limits = c(-140, 140), labels = c("150", "100", "50", "0", "50", "100", "150")) +
-  theme(legend.position="bottom")
+  theme(legend.position="bottom") +
+  scale_fill_manual(values = met.brewer("Tam", 2))
 ```
 
-```{r}
+![](README_files/figure-gfm/unnamed-chunk-5-1.png)
+
+``` r
 el_vaq %>% 
   mutate(year = lubridate::year(dates)) %>% 
   filter(year > 2022 - 10) %>% 
@@ -81,12 +118,15 @@ el_vaq %>%
   facet_wrap(~location, ncol = 1) +
   labs(title = "Distribution of star ratings",
        x = NULL, y = NULL) +
-  scale_y_continuous(labels = scales::label_percent())
+  scale_y_continuous(labels = scales::label_percent()) +
+  scale_fill_manual(values = met.brewer("Tam", 5))
 ```
+
+![](README_files/figure-gfm/unnamed-chunk-6-1.png)
 
 I think it would be easier to read if it was simpler
 
-```{r}
+``` r
 el_vaq %>% 
   mutate(year = lubridate::year(dates)) %>% 
   filter(year > 2022 - 10) %>% 
@@ -98,10 +138,13 @@ el_vaq %>%
   facet_wrap(~location, ncol = 1) +
   labs(title = "Distribution of star ratings",
        x = NULL, y = NULL) +
-  scale_y_continuous(labels = scales::label_percent())
+  scale_y_continuous(labels = scales::label_percent()) +
+  scale_fill_manual(values = met.brewer("Tam", 2))
 ```
 
-```{r}
+![](README_files/figure-gfm/unnamed-chunk-7-1.png)
+
+``` r
 el_vaq %>% 
   mutate(review_location = if_else(state_or_country == "OH", "Ohio",
                                    "Outside Ohio")) %>% 
@@ -111,5 +154,8 @@ el_vaq %>%
   facet_wrap(~review_location, ncol = 1) +
   labs(title = "Distribution of star ratings",
        x = NULL, y = NULL) +
-  scale_y_continuous(labels = scales::label_percent())
+  scale_y_continuous(labels = scales::label_percent()) +
+  scale_fill_manual(values = met.brewer("Tam", 5))
 ```
+
+![](README_files/figure-gfm/unnamed-chunk-8-1.png)
