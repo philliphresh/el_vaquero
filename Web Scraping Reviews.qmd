@@ -217,3 +217,9 @@ file.remove("scrapedpage.html")
 write.csv(el_vaq_data,
           "el vaquero yelp reviews.csv")
 ```
+
+Clean up my environment.
+
+```{r}
+rm(list = ls())
+```
