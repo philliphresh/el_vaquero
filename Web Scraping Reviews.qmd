@@ -1,7 +1,6 @@
 ---
 title: "Web Scraping Reviews"
 format: html
-editor: visual
 ---
 
 ## Loading Packages
