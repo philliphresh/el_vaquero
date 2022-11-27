@@ -1,0 +1,48 @@
+---
+title: "Web Scraping Reviews"
+format: html
+editor: visual
+---
+
+## Loading Packages
+
+```{r}
+#| output: false
+library(tidyverse)
+library(rvest)
+```
+
+## Figure out initial scraping code
+
+```{r}
+restaurant_home_link <- 
+  # "https://www.yelp.com/biz/el-vaquero-mexican-restaurant-columbus-10"
+  "https://www.yelp.com/biz/el-vaquero-mexican-restaurant-columbus-15"
+```
+
+#### Get the count of pages for the restaurant.
+
+```{r}
+page <- read_html(restaurant_home_link)
+
+page_count <- 
+  page %>% 
+  html_element("#reviews 
+               div.border-color--default__09f24__NPAKY.text-align--center__09f24__fYBGO 
+               span.css-chan6m") %>% 
+  html_text() %>% 
+  str_remove("1 of ") %>% 
+  as.numeric()
+```
+
+#### Make list of URLs.
+
+It looks like Yelp shows 10 reviews per page and each page's URL says the number of review it starts on. (E.g., page 2's URL ends in "start=10".
+
+```{r}
+links <-
+  paste0(restaurant_home_link,
+         "?start=",
+         seq(0, (page_count - 1) * 10, 10),
+         "&sort_by=date_asc")
+```
