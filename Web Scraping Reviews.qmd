@@ -90,3 +90,13 @@ dates <-
   html_text() %>% 
   as.Date("%m/%d/%Y")
 ```
+
+#### Get review text
+
+```{r}
+text <-
+  page %>% 
+  html_elements("#reviews > section > div.css-79elbk.border-color--default__09f24__NPAKY li.margin-b5__09f24__pTvws.border-color--default__09f24__NPAKY") %>% 
+  html_element("span.raw__09f24__T4Ezm") %>% 
+  html_text(trim = TRUE)
+```
