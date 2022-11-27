@@ -69,3 +69,47 @@ el_vaq %>%
   scale_x_continuous(limits = c(-140, 140), labels = c("150", "100", "50", "0", "50", "100", "150")) +
   theme(legend.position="bottom")
 ```
+
+```{r}
+el_vaq %>% 
+  mutate(year = lubridate::year(dates)) %>% 
+  filter(year > 2022 - 10) %>% 
+  mutate(year = fct_reorder(as.factor(year), year)) %>% 
+  mutate(ratings = fct_reorder(as.factor(ratings), -ratings)) %>% 
+  ggplot(aes(x = year, fill = ratings)) +
+  geom_bar(position = "fill") +
+  facet_wrap(~location, ncol = 1) +
+  labs(title = "Distribution of star ratings",
+       x = NULL, y = NULL) +
+  scale_y_continuous(labels = scales::label_percent())
+```
+
+I think it would be easier to read if it was simpler
+
+```{r}
+el_vaq %>% 
+  mutate(year = lubridate::year(dates)) %>% 
+  filter(year > 2022 - 10) %>% 
+  mutate(year = fct_reorder(as.factor(year), year)) %>% 
+  mutate(ratings_simple = if_else(ratings > 3.5, "4 or 5", "1, 2, or 3")) %>% 
+  mutate(ratings_simple = fct_reorder(ratings_simple, -ratings)) %>% 
+  ggplot(aes(x = year, fill = ratings_simple)) +
+  geom_bar(position = "fill") +
+  facet_wrap(~location, ncol = 1) +
+  labs(title = "Distribution of star ratings",
+       x = NULL, y = NULL) +
+  scale_y_continuous(labels = scales::label_percent())
+```
+
+```{r}
+el_vaq %>% 
+  mutate(review_location = if_else(state_or_country == "OH", "Ohio",
+                                   "Outside Ohio")) %>% 
+  mutate(ratings = fct_reorder(as.factor(ratings), -ratings)) %>% 
+  ggplot(aes(x = location, fill = ratings)) +
+  geom_bar(position = "fill") +
+  facet_wrap(~review_location, ncol = 1) +
+  labs(title = "Distribution of star ratings",
+       x = NULL, y = NULL) +
+  scale_y_continuous(labels = scales::label_percent())
+```
