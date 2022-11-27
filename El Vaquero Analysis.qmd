@@ -35,3 +35,37 @@ el_vaq <-
            str_remove(",$") %>% 
            str_trim())
 ```
+
+## Quick data vizes
+
+Side-by-side proportional bar plot of ratings distribution
+
+```{r}
+el_vaq %>% 
+  mutate(ratings = fct_reorder(as.factor(ratings), -ratings)) %>% 
+  ggplot(aes(x = location, fill = ratings)) +
+  geom_bar(position = "fill") +
+  labs(title = "Distribution of star ratings",
+       x = NULL, y = NULL) +
+  scale_y_continuous(labels = scales::label_percent())
+```
+
+```{r}
+el_vaq %>% 
+  mutate(international = state_or_country %in% c("France", "Ireland", "Singapore")) %>% 
+  mutate(state_or_country = fct_lump_min(state_or_country, 5)) %>% 
+  mutate(state_or_country = if_else(international, 
+                                    "International", 
+                                    state_or_country %>% as.character())) %>% 
+  count(location, state_or_country, sort = TRUE) %>% 
+  group_by(location) %>% 
+  mutate(state_or_country = fct_reorder(state_or_country, n)) %>% 
+  mutate(n = if_else(location == "Olentangy", -n, n)) %>% 
+  ggplot(aes(n, state_or_country, fill = location)) +
+  geom_col() + 
+  labs(title = "Count of reviews by people from different locations",
+       y = NULL, x = NULL, fill = NULL,
+       subtitle = "Olentangy has a lot more visitors outside of Ohio") +
+  scale_x_continuous(limits = c(-140, 140), labels = c("150", "100", "50", "0", "50", "100", "150")) +
+  theme(legend.position="bottom")
+```
