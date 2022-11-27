@@ -45,5 +45,3 @@ links <-
          seq(0, (page_count - 1) * 10, 10),
          "&sort_by=date_asc")
 ```
-
-text
