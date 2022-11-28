@@ -2,6 +2,7 @@
 title: "El Vaquero Analysis"
 author: "Phillip Sanderell"
 format: gfm
+fig-dpi: 600
 editor: visual
 ---
 
@@ -10,6 +11,7 @@ editor: visual
 Load the scraped review data.
 
 ```{r}
+#| output: false
 library(tidyverse)
 el_vaq <- read_csv("el vaquero yelp reviews.csv")
 ```
