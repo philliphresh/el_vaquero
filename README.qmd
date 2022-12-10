@@ -51,10 +51,10 @@ sysfonts::font_add(family = "Museo",
                    bold = "Museo700-Regular.otf")
 theme_set(theme_minimal(
   base_family = "Museo",
-  base_size = 5
+  base_size = 12
 ) + 
   theme(plot.title.position = "plot",
-        plot.title = element_text(face = "bold", size = 7, 
+        plot.title = element_text(face = "bold", size = 20, 
                              margin = margin(b = 20))))
 ```
 
@@ -247,7 +247,7 @@ el_vaq %>%
   geom_line(aes(color = better_location), size = 1.5, alpha = .5) +
   geom_point(aes(color = location), size = 4) +
   geom_text(aes(label = word, x = max_rating, y = word),
-            hjust = 0, nudge_x = .25, check_overlap = TRUE, size = 1.5,
+            hjust = 0, nudge_x = .25, check_overlap = TRUE, size = 4,
             family = "Museo") +
   scale_x_continuous(limits = c(0, 5)) +
   theme(legend.position = c(.5 / 5, 20.5 / 22),
@@ -256,9 +256,7 @@ el_vaq %>%
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
         panel.grid = element_blank(),
-        axis.text.y = element_blank(),
-        plot.title = element_text(face = "bold", size = 7, 
-                             margin = margin(b = 20))) +
+        axis.text.y = element_blank()) +
   labs(y = NULL,
        x = "Avgerage Rating (1-5 stars)",
        color = NULL,
@@ -266,7 +264,7 @@ el_vaq %>%
   scale_color_manual(values = met.brewer("Tam", 2)) +
   coord_cartesian(ylim = c(1, 22)) +
   annotate(geom = "text", x = 4.75, y = 22, label = "Reviews mentioning...",
-           hjust = 1, fontface = "bold", family = "Museo", size = 1.5)
+           hjust = 1, fontface = "bold", family = "Museo", size = 4.5)
 ```
 
 The top 20 words related to experience mentioned are:
@@ -348,7 +346,7 @@ el_vaq %>%
   geom_line(aes(color = better_location), size = 1.5, alpha = .5) +
   geom_point(aes(color = location), size = 4) +
   geom_text(aes(label = word, x = max_rating, y = word),
-            hjust = 0, nudge_x = .25, check_overlap = TRUE, size = 1.5,
+            hjust = 0, nudge_x = .25, check_overlap = TRUE, size = 4,
             family = "Museo") +
   scale_x_continuous(limits = c(0, 5)) +
   theme(legend.position = c(.5 / 5, 20.5 / 22),
@@ -357,9 +355,7 @@ el_vaq %>%
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
         panel.grid = element_blank(),
-        axis.text.y = element_blank(),
-        plot.title = element_text(face = "bold", size = 7, 
-                             margin = margin(b = 20))) +
+        axis.text.y = element_blank()) +
   labs(y = NULL,
        x = "Avgerage Rating (1-5 stars)",
        color = NULL,
@@ -367,5 +363,5 @@ el_vaq %>%
   scale_color_manual(values = met.brewer("Tam", 2)) +
   coord_cartesian(ylim = c(1, 22)) +
   annotate(geom = "text", x = 4.75, y = 22, label = "Reviews mentioning...",
-           hjust = 1, fontface = "bold", family = "Museo", size = 1.5)
+           hjust = 1, fontface = "bold", family = "Museo", size = 4.5)
 ```
