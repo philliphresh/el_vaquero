@@ -35,7 +35,7 @@ el_vaq <-
 
 ## Quick data vizes
 
-Make the vizes pretty
+Make the vizes pretty.
 
 ``` r
 library(MetBrewer)
@@ -61,9 +61,13 @@ el_vaq %>%
   ggplot(aes(x = location, fill = ratings)) +
   geom_bar(position = "fill") +
   labs(title = "Distribution of star ratings",
-       x = NULL, y = NULL) +
+       x = NULL, y = NULL, fill = "Stars",
+       caption = "Data from Yelp | Visualization by @PhilliPhresh") +
   scale_y_continuous(labels = scales::label_percent()) +
-  scale_fill_manual(values = met.brewer("Tam", 5))
+  scale_fill_manual(values = met.brewer("Tam", 5)) +
+  theme(plot.caption.position = "plot",
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.y = element_blank())
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-4-1.png)
@@ -83,9 +87,12 @@ el_vaq %>%
   geom_col() + 
   labs(title = "Count of reviews by people from different locations",
        y = NULL, x = NULL, fill = NULL,
-       subtitle = "Olentangy has a lot more visitors outside of Ohio") +
+       subtitle = "Olentangy has a lot more visitors outside of Ohio",
+       caption = "Data from Yelp | Visualization by @PhilliPhresh") +
   scale_x_continuous(limits = c(-140, 140), labels = c("150", "100", "50", "0", "50", "100", "150")) +
-  theme(legend.position="bottom") +
+  theme(legend.position = "bottom",
+        plot.caption.position = "plot",
+        panel.grid.minor = element_blank()) +
   scale_fill_manual(values = met.brewer("Tam", 2))
 ```
 
@@ -101,9 +108,13 @@ el_vaq %>%
   geom_bar(position = "fill") +
   facet_wrap(~location, ncol = 1) +
   labs(title = "Distribution of star ratings",
-       x = NULL, y = NULL) +
+       x = NULL, y = NULL, fill = "Stars",
+       caption = "Data from Yelp | Visualization by @PhilliPhresh") +
   scale_y_continuous(labels = scales::label_percent()) +
-  scale_fill_manual(values = met.brewer("Tam", 5))
+  scale_fill_manual(values = met.brewer("Tam", 5)) +
+  theme(plot.caption.position = "plot",
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.y = element_blank())
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-6-1.png)
@@ -121,9 +132,14 @@ el_vaq %>%
   geom_bar(position = "fill") +
   facet_wrap(~location, ncol = 1) +
   labs(title = "Distribution of star ratings",
-       x = NULL, y = NULL) +
+       x = NULL, y = NULL,
+       caption = "Data from Yelp | Visualization by @PhilliPhresh",
+       fill = "Stars") +
   scale_y_continuous(labels = scales::label_percent()) +
-  scale_fill_manual(values = met.brewer("Tam", 2))
+  scale_fill_manual(values = met.brewer("Tam", 2)) +
+  theme(plot.caption.position = "plot",
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.y = element_blank())
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-7-1.png)
@@ -137,9 +153,11 @@ el_vaq %>%
   geom_bar(position = "fill") +
   facet_wrap(~review_location, ncol = 1) +
   labs(title = "Distribution of star ratings",
-       x = NULL, y = NULL) +
+       x = NULL, y = NULL,
+       caption = "Data from Yelp | Visualization by @PhilliPhresh") +
   scale_y_continuous(labels = scales::label_percent()) +
-  scale_fill_manual(values = met.brewer("Tam", 5))
+  scale_fill_manual(values = met.brewer("Tam", 5)) +
+  theme(plot.caption.position = "plot")
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-8-1.png)
@@ -283,11 +301,13 @@ el_vaq %>%
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
         panel.grid = element_blank(),
-        axis.text.y = element_blank()) +
+        axis.text.y = element_blank(),
+        plot.caption.position = "plot") +
   labs(y = NULL,
-       x = "Avgerage Rating (1-5 stars)",
+       x = "Avgerage Rating (0-5 stars)",
        color = NULL,
-       title = "Most mentioned word, sorted by average rating") +
+       title = "Most mentioned word, sorted by average rating",
+       caption = "Data from Yelp | Visualization by @PhilliPhresh") +
   scale_color_manual(values = met.brewer("Tam", 2)) +
   coord_cartesian(ylim = c(1, 22)) +
   annotate(geom = "text", x = 4.75, y = 22, label = "Reviews mentioning...",
@@ -387,11 +407,13 @@ el_vaq %>%
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
         panel.grid = element_blank(),
-        axis.text.y = element_blank()) +
+        axis.text.y = element_blank(),
+        plot.caption.position = "plot") +
   labs(y = NULL,
-       x = "Avgerage Rating (1-5 stars)",
+       x = "Avgerage Rating (0-5 stars)",
        color = NULL,
-       title = "Most mentioned word, sorted by average rating") +
+       title = "Most mentioned word, sorted by average rating",
+       caption = "Data from Yelp | Visualization by @PhilliPhresh") +
   scale_color_manual(values = met.brewer("Tam", 2)) +
   coord_cartesian(ylim = c(1, 22)) +
   annotate(geom = "text", x = 4.75, y = 22, label = "Reviews mentioning...",

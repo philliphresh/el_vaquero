@@ -4,6 +4,8 @@ author: "Phillip Sanderell"
 format: gfm
 fig-dpi: 600
 editor: visual
+editor_options: 
+  chunk_output_type: inline
 ---
 
 ## Import Data
@@ -19,6 +21,9 @@ el_vaq <- read_csv("el vaquero yelp reviews.csv")
 ## Clean Data
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+
 el_vaq <- 
   el_vaq %>% 
   select(-...1) %>% 
@@ -40,9 +45,12 @@ el_vaq <-
 
 ## Quick data vizes
 
-Make the vizes pretty
+Make the vizes pretty.
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+
 library(MetBrewer)
 showtext::showtext_auto()
 showtext::showtext_opts(dpi = 600)
@@ -61,17 +69,27 @@ theme_set(theme_minimal(
 Side-by-side proportional bar plot of ratings distribution
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+
 el_vaq %>% 
   mutate(ratings = fct_reorder(as.factor(ratings), -ratings)) %>% 
   ggplot(aes(x = location, fill = ratings)) +
   geom_bar(position = "fill") +
   labs(title = "Distribution of star ratings",
-       x = NULL, y = NULL) +
+       x = NULL, y = NULL, fill = "Stars",
+       caption = "Data from Yelp | Visualization by @PhilliPhresh") +
   scale_y_continuous(labels = scales::label_percent()) +
-  scale_fill_manual(values = met.brewer("Tam", 5))
+  scale_fill_manual(values = met.brewer("Tam", 5)) +
+  theme(plot.caption.position = "plot",
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.y = element_blank())
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+
 el_vaq %>% 
   mutate(international = state_or_country %in% c("France", "Ireland", "Singapore")) %>% 
   mutate(state_or_country = fct_lump_min(state_or_country, 5)) %>% 
@@ -86,13 +104,19 @@ el_vaq %>%
   geom_col() + 
   labs(title = "Count of reviews by people from different locations",
        y = NULL, x = NULL, fill = NULL,
-       subtitle = "Olentangy has a lot more visitors outside of Ohio") +
+       subtitle = "Olentangy has a lot more visitors outside of Ohio",
+       caption = "Data from Yelp | Visualization by @PhilliPhresh") +
   scale_x_continuous(limits = c(-140, 140), labels = c("150", "100", "50", "0", "50", "100", "150")) +
-  theme(legend.position="bottom") +
+  theme(legend.position = "bottom",
+        plot.caption.position = "plot",
+        panel.grid.minor = element_blank()) +
   scale_fill_manual(values = met.brewer("Tam", 2))
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+
 el_vaq %>% 
   mutate(year = lubridate::year(dates)) %>% 
   filter(year > 2022 - 10) %>% 
@@ -102,14 +126,21 @@ el_vaq %>%
   geom_bar(position = "fill") +
   facet_wrap(~location, ncol = 1) +
   labs(title = "Distribution of star ratings",
-       x = NULL, y = NULL) +
+       x = NULL, y = NULL, fill = "Stars",
+       caption = "Data from Yelp | Visualization by @PhilliPhresh") +
   scale_y_continuous(labels = scales::label_percent()) +
-  scale_fill_manual(values = met.brewer("Tam", 5))
+  scale_fill_manual(values = met.brewer("Tam", 5)) +
+  theme(plot.caption.position = "plot",
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.y = element_blank())
 ```
 
 I think it would be easier to read if it was simpler
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+
 el_vaq %>% 
   mutate(year = lubridate::year(dates)) %>% 
   filter(year > 2022 - 10) %>% 
@@ -120,12 +151,20 @@ el_vaq %>%
   geom_bar(position = "fill") +
   facet_wrap(~location, ncol = 1) +
   labs(title = "Distribution of star ratings",
-       x = NULL, y = NULL) +
+       x = NULL, y = NULL,
+       caption = "Data from Yelp | Visualization by @PhilliPhresh",
+       fill = "Stars") +
   scale_y_continuous(labels = scales::label_percent()) +
-  scale_fill_manual(values = met.brewer("Tam", 2))
+  scale_fill_manual(values = met.brewer("Tam", 2)) +
+  theme(plot.caption.position = "plot",
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.y = element_blank())
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+
 el_vaq %>% 
   mutate(review_location = if_else(state_or_country == "OH", "Ohio",
                                    "Outside Ohio")) %>% 
@@ -134,9 +173,11 @@ el_vaq %>%
   geom_bar(position = "fill") +
   facet_wrap(~review_location, ncol = 1) +
   labs(title = "Distribution of star ratings",
-       x = NULL, y = NULL) +
+       x = NULL, y = NULL,
+       caption = "Data from Yelp | Visualization by @PhilliPhresh") +
   scale_y_continuous(labels = scales::label_percent()) +
-  scale_fill_manual(values = met.brewer("Tam", 5))
+  scale_fill_manual(values = met.brewer("Tam", 5)) +
+  theme(plot.caption.position = "plot")
 ```
 
 It would be cool to see a comparison of ratings for the most popularly mentioned food items. I could tokenize the ratings, sort by count, and manualy read through to get maybe the top 10-20 tokens that I recognize as food. Then with that list of tokens make comparisons between locations. Potential questions I'm initially thinking include:
@@ -146,6 +187,9 @@ It would be cool to see a comparison of ratings for the most popularly mentioned
 -   Are cerain food items more popular in one location than the other?
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+
 library(tidytext)
 
 el_vaq %>% 
@@ -200,6 +244,9 @@ The top 20 food items mentioned are:
 20. meat
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+
 most_mentioned_food <-
   c(
     "salsa",
@@ -256,11 +303,13 @@ el_vaq %>%
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
         panel.grid = element_blank(),
-        axis.text.y = element_blank()) +
+        axis.text.y = element_blank(),
+        plot.caption.position = "plot") +
   labs(y = NULL,
-       x = "Avgerage Rating (1-5 stars)",
+       x = "Avgerage Rating (0-5 stars)",
        color = NULL,
-       title = "Most mentioned word, sorted by average rating") +
+       title = "Most mentioned word, sorted by average rating",
+       caption = "Data from Yelp | Visualization by @PhilliPhresh") +
   scale_color_manual(values = met.brewer("Tam", 2)) +
   coord_cartesian(ylim = c(1, 22)) +
   annotate(geom = "text", x = 4.75, y = 22, label = "Reviews mentioning...",
@@ -310,6 +359,9 @@ The top 20 words related to experience mentioned are:
 20. town
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+
 most_mentioned_experience <-
   c(
     "service",    
@@ -355,11 +407,13 @@ el_vaq %>%
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
         panel.grid = element_blank(),
-        axis.text.y = element_blank()) +
+        axis.text.y = element_blank(),
+        plot.caption.position = "plot") +
   labs(y = NULL,
-       x = "Avgerage Rating (1-5 stars)",
+       x = "Avgerage Rating (0-5 stars)",
        color = NULL,
-       title = "Most mentioned word, sorted by average rating") +
+       title = "Most mentioned word, sorted by average rating",
+       caption = "Data from Yelp | Visualization by @PhilliPhresh") +
   scale_color_manual(values = met.brewer("Tam", 2)) +
   coord_cartesian(ylim = c(1, 22)) +
   annotate(geom = "text", x = 4.75, y = 22, label = "Reviews mentioning...",
