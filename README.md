@@ -2,14 +2,44 @@ El Vaquero Analysis
 ================
 Phillip Sanderell
 
+## Executive Summary
+
+El Vaquero is my favorite local restaurant franchise. But while I like
+the Olentangy location, the rest of my family prefers the Riverside
+location. I scraped review data from Yelp for both locations to see if I
+could form an argument based on data to convince my family that the
+Olentangy location is superior.
+
+Against my suspicions, Yelp reviews favor the Riverside location. My
+favorite visualizations to illustrate this are the dumbbell plots I made
+below. The first plot shows average rating for reviews that mention
+food-related words and the second plot shows the same but for
+experience-related words. At least it’s just me that is crazy and not my
+whole family.
+
+    `summarise()` has grouped output by 'word'. You can override using the
+    `.groups` argument.
+
+![](README_files/figure-gfm/unnamed-chunk-2-1.png)
+
+    `summarise()` has grouped output by 'word'. You can override using the
+    `.groups` argument.
+
+![](README_files/figure-gfm/unnamed-chunk-3-1.png)
+
 ## Import Data
 
 Load the scraped review data.
 
-``` r
-library(tidyverse)
-el_vaq <- read_csv("el vaquero yelp reviews.csv")
-```
+    New names:
+    Rows: 360 Columns: 7
+    ── Column specification
+    ──────────────────────────────────────────────────────── Delimiter: "," chr
+    (4): link, usernames, user_locations, text dbl (2): ...1, ratings date (1):
+    dates
+    ℹ Use `spec()` to retrieve the full column specification for this data. ℹ
+    Specify the column types or set `show_col_types = FALSE` to quiet this message.
+    • `` -> `...1`
 
 ## Clean Data
 
@@ -70,7 +100,7 @@ el_vaq %>%
         panel.grid.minor.y = element_blank())
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-4-1.png)
+![](README_files/figure-gfm/unnamed-chunk-7-1.png)
 
 ``` r
 el_vaq %>% 
@@ -96,7 +126,7 @@ el_vaq %>%
   scale_fill_manual(values = met.brewer("Tam", 2))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-5-1.png)
+![](README_files/figure-gfm/unnamed-chunk-8-1.png)
 
 ``` r
 el_vaq %>% 
@@ -117,7 +147,7 @@ el_vaq %>%
         panel.grid.minor.y = element_blank())
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-6-1.png)
+![](README_files/figure-gfm/unnamed-chunk-9-1.png)
 
 I think it would be easier to read if it was simpler
 
@@ -142,7 +172,7 @@ el_vaq %>%
         panel.grid.minor.y = element_blank())
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-7-1.png)
+![](README_files/figure-gfm/unnamed-chunk-10-1.png)
 
 ``` r
 el_vaq %>% 
@@ -160,7 +190,7 @@ el_vaq %>%
   theme(plot.caption.position = "plot")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-8-1.png)
+![](README_files/figure-gfm/unnamed-chunk-11-1.png)
 
 It would be cool to see a comparison of ratings for the most popularly
 mentioned food items. I could tokenize the ratings, sort by count, and
@@ -317,7 +347,7 @@ el_vaq %>%
     `summarise()` has grouped output by 'word'. You can override using the
     `.groups` argument.
 
-![](README_files/figure-gfm/unnamed-chunk-10-1.png)
+![](README_files/figure-gfm/unnamed-chunk-13-1.png)
 
 The top 20 words related to experience mentioned are:
 
@@ -423,4 +453,4 @@ el_vaq %>%
     `summarise()` has grouped output by 'word'. You can override using the
     `.groups` argument.
 
-![](README_files/figure-gfm/unnamed-chunk-11-1.png)
+![](README_files/figure-gfm/unnamed-chunk-14-1.png)

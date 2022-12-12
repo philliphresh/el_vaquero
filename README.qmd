@@ -8,12 +8,194 @@ editor_options:
   chunk_output_type: inline
 ---
 
+## Executive Summary
+
+El Vaquero is my favorite local restaurant franchise. But while I like the Olentangy location, the rest of my family prefers the Riverside location. I scraped review data from Yelp for both locations to see if I could form an argument based on data to convince my family that the Olentangy location is superior.
+
+Against my suspicions, Yelp reviews favor the Riverside location. My favorite visualizations to illustrate this are the dumbbell plots I made below. The first plot shows average rating for reviews that mention food-related words and the second plot shows the same but for experience-related words. At least it's just me that is crazy and not my whole family.
+
+```{r}
+#| include: false
+
+# This is all the code I need to be able to actuqlly present the two plots in the executive summary
+library(tidyverse)
+library(tidytext)
+
+el_vaq <- read_csv("el vaquero yelp reviews.csv")
+
+library(MetBrewer)
+showtext::showtext_auto()
+showtext::showtext_opts(dpi = 600)
+sysfonts::font_add(family = "Museo", 
+                   regular = "Museo300-Regular.otf", 
+                   bold = "Museo700-Regular.otf")
+theme_set(theme_minimal(
+  base_family = "Museo",
+  base_size = 12
+) + 
+  theme(plot.title.position = "plot",
+        plot.title = element_text(face = "bold", size = 20, 
+                             margin = margin(b = 20))))
+
+
+el_vaq <- 
+  el_vaq %>% 
+  select(-...1) %>% 
+  mutate(original_link = link) %>% 
+  mutate(link = str_remove(link, "https://www.yelp.com/biz/el-vaquero-mexican-restaurant-columbus-")) %>% 
+  mutate(link = str_extract(link, "^\\d+")) %>% 
+  mutate(location = case_when(link == 10 ~ "Riverside",
+                              link == 15 ~ "Olentangy",
+                              TRUE ~ "check")) %>% 
+  select(-link) %>% 
+  mutate(state_or_country = str_remove(user_locations, "(.*)\\s")) %>% 
+  mutate(city = if_else(str_count(user_locations, ",") > 1,
+                              str_extract(user_locations, ",\\s(.*),"),
+                              str_extract(user_locations, "(.*),"))) %>% 
+  mutate(city = str_remove(city, "^,") %>% 
+           str_remove(",$") %>% 
+           str_trim())
+```
+
+```{r}
+#| echo: false
+
+most_mentioned_food <-
+  c(
+    "salsa",
+    "margaritas",
+    "chips",
+    "chicken",
+    "cheese",
+    "tacos",
+    "beans",
+    "rice",
+    "sauce",
+    "burrito",
+    "dip",
+    "beef",
+    "queso",
+    "shrimp",
+    "fajitas",
+    "enchiladas",
+    "guacamole",
+    "steak",
+    "tortillas",
+    "meat"
+  )
+
+el_vaq %>% 
+  unnest_tokens(word, text) %>% 
+  anti_join(stop_words, by = "word") %>% 
+  mutate(word = case_when(word == "taco" ~ "tacos",
+                          word == "margarita" ~ "margaritas",
+                          word == "fajita" ~ "fajitas",
+                          TRUE ~ word)) %>% 
+  filter(word %in% most_mentioned_food) %>% 
+  group_by(word, location) %>% 
+  summarise(avg_rating = mean(ratings)) %>% 
+  group_by(word) %>% 
+  mutate(max_rating = max(avg_rating)) %>% 
+  mutate(better_location = 
+           case_when(avg_rating == max_rating & location == "Riverside" ~ "Riverside",
+                     avg_rating == max_rating & location == "Olentangy" ~ "Olentangy",
+                     avg_rating != max_rating & location == "Riverside" ~ "Olentangy",
+                     avg_rating != max_rating & location == "Olentangy" ~ "Riverside", TRUE ~ "check")) %>% 
+  ungroup() %>% 
+  mutate(word = fct_reorder(word, max_rating)) %>% 
+  ggplot(aes(avg_rating, word)) +
+  geom_line(aes(color = better_location), size = 1.5, alpha = .5) +
+  geom_point(aes(color = location), size = 4) +
+  geom_text(aes(label = word, x = max_rating, y = word),
+            hjust = 0, nudge_x = .25, check_overlap = TRUE, size = 4,
+            family = "Museo") +
+  scale_x_continuous(limits = c(0, 5)) +
+  theme(legend.position = c(.5 / 5, 20.5 / 22),
+        legend.direction = "vertical",
+        legend.justification = c(0, 1),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid = element_blank(),
+        axis.text.y = element_blank(),
+        plot.caption.position = "plot") +
+  labs(y = NULL,
+       x = "Avgerage Rating (0-5 stars)",
+       color = NULL,
+       title = "Most mentioned word, sorted by average rating",
+       caption = "Data from Yelp | Visualization by @PhilliPhresh") +
+  scale_color_manual(values = met.brewer("Tam", 2)) +
+  coord_cartesian(ylim = c(1, 22)) +
+  annotate(geom = "text", x = 4.75, y = 22, label = "Reviews mentioning...",
+           hjust = 1, fontface = "bold", family = "Museo", size = 4.5)
+```
+
+```{r}
+#| echo: false
+
+most_mentioned_experience <-
+  c(
+    "service",    
+    "quick", # used for time / fast / minutes / times / quick / quickly
+    "pretty",    "location",
+    "staff",    "table",
+    "people",    "friendly",
+    "patio",    "experience",
+    "server",    "home",
+    "busy",    "prices",
+    "night",    "portions",
+    "spot",    "wait",
+    "served",    "town"
+  )
+
+el_vaq %>% 
+  unnest_tokens(word, text) %>% 
+  anti_join(stop_words, by = "word") %>% 
+  mutate(word = if_else(word %in% c("fast", "minutes", "time", "quick",
+                                    "quickly"), "quick", word)) %>% 
+  filter(word %in% most_mentioned_experience) %>% 
+  group_by(word, location) %>% 
+  summarise(avg_rating = mean(ratings), .groups = ) %>% 
+  group_by(word) %>% 
+  mutate(max_rating = max(avg_rating)) %>% 
+  mutate(better_location = 
+           case_when(avg_rating == max_rating & location == "Riverside" ~ "Riverside",
+                     avg_rating == max_rating & location == "Olentangy" ~ "Olentangy",
+                     avg_rating != max_rating & location == "Riverside" ~ "Olentangy",
+                     avg_rating != max_rating & location == "Olentangy" ~ "Riverside", TRUE ~ "check")) %>% 
+  ungroup() %>% 
+  mutate(word = fct_reorder(word, max_rating)) %>% 
+  ggplot(aes(avg_rating, word)) +
+  geom_line(aes(color = better_location), size = 1.5, alpha = .5) +
+  geom_point(aes(color = location), size = 4) +
+  geom_text(aes(label = word, x = max_rating, y = word),
+            hjust = 0, nudge_x = .25, check_overlap = TRUE, size = 4,
+            family = "Museo") +
+  scale_x_continuous(limits = c(0, 5)) +
+  theme(legend.position = c(.5 / 5, 20.5 / 22),
+        legend.direction = "vertical",
+        legend.justification = c(0, 1),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid = element_blank(),
+        axis.text.y = element_blank(),
+        plot.caption.position = "plot") +
+  labs(y = NULL,
+       x = "Avgerage Rating (0-5 stars)",
+       color = NULL,
+       title = "Most mentioned word, sorted by average rating",
+       caption = "Data from Yelp | Visualization by @PhilliPhresh") +
+  scale_color_manual(values = met.brewer("Tam", 2)) +
+  coord_cartesian(ylim = c(1, 22)) +
+  annotate(geom = "text", x = 4.75, y = 22, label = "Reviews mentioning...",
+           hjust = 1, fontface = "bold", family = "Museo", size = 4.5)
+```
+
 ## Import Data
 
 Load the scraped review data.
 
 ```{r}
-#| output: false
+#| echo: false
 library(tidyverse)
 el_vaq <- read_csv("el vaquero yelp reviews.csv")
 ```
