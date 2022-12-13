@@ -25,6 +25,11 @@ whole family.
 
 Load the scraped review data.
 
+``` r
+library(tidyverse)
+el_vaq <- read_csv("el vaquero yelp reviews.csv")
+```
+
     New names:
     Rows: 360 Columns: 7
     ── Column specification
