@@ -195,7 +195,6 @@ el_vaq %>%
 Load the scraped review data.
 
 ```{r}
-#| echo: false
 library(tidyverse)
 el_vaq <- read_csv("el vaquero yelp reviews.csv")
 ```
