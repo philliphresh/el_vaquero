@@ -17,13 +17,7 @@ food-related words and the second plot shows the same but for
 experience-related words. At least it’s just me that is crazy and not my
 whole family.
 
-    `summarise()` has grouped output by 'word'. You can override using the
-    `.groups` argument.
-
 ![](README_files/figure-gfm/unnamed-chunk-2-1.png)
-
-    `summarise()` has grouped output by 'word'. You can override using the
-    `.groups` argument.
 
 ![](README_files/figure-gfm/unnamed-chunk-3-1.png)
 

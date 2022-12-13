@@ -17,7 +17,7 @@ Against my suspicions, Yelp reviews favor the Riverside location. My favorite vi
 ```{r}
 #| include: false
 
-# This is all the code I need to be able to actuqlly present the two plots in the executive summary
+# This is all the code I need to be able to actually present the two plots in the executive summary
 library(tidyverse)
 library(tidytext)
 
@@ -93,7 +93,7 @@ el_vaq %>%
                           TRUE ~ word)) %>% 
   filter(word %in% most_mentioned_food) %>% 
   group_by(word, location) %>% 
-  summarise(avg_rating = mean(ratings)) %>% 
+  summarise(avg_rating = mean(ratings), .groups = "drop") %>% 
   group_by(word) %>% 
   mutate(max_rating = max(avg_rating)) %>% 
   mutate(better_location = 
@@ -154,7 +154,7 @@ el_vaq %>%
                                     "quickly"), "quick", word)) %>% 
   filter(word %in% most_mentioned_experience) %>% 
   group_by(word, location) %>% 
-  summarise(avg_rating = mean(ratings), .groups = ) %>% 
+  summarise(avg_rating = mean(ratings), .groups = "drop") %>% 
   group_by(word) %>% 
   mutate(max_rating = max(avg_rating)) %>% 
   mutate(better_location = 
